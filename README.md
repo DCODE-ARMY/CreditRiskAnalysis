@@ -44,7 +44,7 @@ Traditional credit-risk analysis is **slow, siloed and manual**.
 ## 🏗️ Architecture
 
 <p align="center">
-  <img src="docs/architecture.jpg" alt="Architecture Diagram" width="100%">
+  <img src="docs/architecture.png" alt="Architecture Diagram" width="100%">
 </p>
 
 *(Need the editable Draw.io file? Check `docs/architecture.drawio`.)*
