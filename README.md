@@ -1,9 +1,9 @@
 <!-- ====================================================== -->
-<!--  Market Cloud – Credit-Risk Dashboard  •  README.md     -->
+<!--   Credit-Risk Dashboard  •  README.md     -->
 <!--  (copy–paste directly into GitHub – all renders fine)   -->
 <!-- ====================================================== -->
 
-<h1 align="center">📊 Market Cloud – Credit-Risk Dashboard</h1>
+<h1 align="center">📊 Credit-Risk Dashboard</h1>
 <p align="center">
   <em>AI-driven, multi-agent platform that turns noisy market data, news &amp; public sentiment into a crystal-clear credit-risk score.</em>
 </p>
@@ -19,7 +19,7 @@
 
 ## 🗺️ About the Project
 Traditional credit-risk analysis is **slow, siloed and manual**.  
-**Market Cloud** re-imagines the workflow with:
+**I** re-imagined the workflow with:
 
 * **Multi-Agent Intelligence** – each agent is an expert (research, sentiment, risk) that collaborates through [CrewAI](https://github.com/joaomdmoura/crewai).
 * **Real-Time Data Fusion** – live market metrics (CDS spreads, bond yields), breaking news, regulatory filings **and** crowd sentiment are collected & scored on the fly.
@@ -55,8 +55,8 @@ Traditional credit-risk analysis is **slow, siloed and manual**.
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-org/market-cloud.git
-cd market-cloud
+git clone https://github.com/DCODE-ARMY/CreditRiskAnalysis.git
+cd DCODE-ARMY
 
 # 2. Create & activate virtual env
 python -m venv .venv
