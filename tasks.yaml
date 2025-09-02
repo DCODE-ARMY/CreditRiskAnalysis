@@ -1,0 +1,184 @@
+market_data_task:
+  description: >
+    Objective: Collect, analyze, and synthesize comprehensive credit market indicators and company financial health data for {company}.
+
+    Step-by-Step Instructions:
+
+    1.  Initial Setup:
+        Use the DateTimeTool to get the current date and time. This will be crucial for contextualizing historical data and report timeliness.
+
+    2.  Core Quantitative Data Collection (FinanceTool):
+        Utilize the finance_tool as the primary source to gather detailed quantitative data.
+        Capture all available metrics provided by the tool, focusing on (but not limited to):
+            Credit ratings (e.g., from S&P, Fitch, Moody's)
+            Market liquidity measures (e.g., trading volume, bid-ask spreads)
+            Debt-to-equity ratios
+            Cash flow stability metrics (e.g., free cash flow, operating cash flow)
+            Other key financial metrics (e.g., market capitalization, Altman Z-Score, Piotroski Score, TTM metrics, revenue growth, profitability ratios).
+        For each metric, record its latest_value.
+
+    3.  Company Filings Analysis (CompaniesHouseTool & PDFQATool):
+        Use the CompaniesHouseTool to download the latest available company filings and financial statements for {company}.
+        Employ the PDFQATool to interact with these downloaded PDF documents. Your goal is to:
+            Extract key financial figures that might supplement or verify data from finance_tool.
+            Identify and summarize significant changes in financial performance, key risk factors discussed, management's outlook, and any major strategic shifts mentioned in the filings compared to previous periods (if discernible).
+
+    4.  Historical Trend Analysis & Gap Filling (FinanceTool & SearchTool):
+        For each metric obtained from finance_tool, attempt to determine its historical_trend over the past 1-5 years.
+        Prioritize using the finance_tool for historical data.
+        If finance_tool lacks sufficient historical data, or for qualitative context, use the search_tool to consult credible financial sources (e.g., SEC filings like 10-K/Q if applicable, Bloomberg, Reuters, reputable financial news).
+        Frame historical trends using the current date (e.g., 'upward trend from [current_date - 5 years] to [current_date]').
+        If a metric's data is entirely unavailable after exhausting these tools, exclude it from the final output. Do not use placeholders like 'Data not found'.
+
+    5.  Output Generation (Conform to MarketDataOutput Pydantic Model):
+        Compile all gathered information into the MarketDataOutput Pydantic model.
+        overview: Provide a concise summary of your data collection approach, detailing the primary tools used (finance_tool, search_tool, CompaniesHouseTool, PDFQATool, DateTimeTool) and key sources consulted.
+        metrics: Create a comprehensive list of FinancialMetric objects. Each object must include name, latest_value (numeric or string as provided by the source), and historical_trend (a descriptive string, if available).
+        historical_vs_current: Develop a detailed narrative comparing the historical trends (over the past 1-5 years) to the current values for all collected metrics. Highlight significant changes, stability, improvements, or deteriorations.
+        company_filings_analysis_narrative: Capture the complete, structured text output derived from the analysis of company filings (using PDFQATool with documents from CompaniesHouseTool).
+            This output should ideally include sections like 'Key Financial Figures', 'Significant Changes in Financial Performance',
+            'Risk Factors', 'Management's Outlook', and an overall 'Summary'. The entire report text should be placed in this field as a single string.
+        sources: Compile a list of all references used. This must include 'finance_tool', 'CompaniesHouseTool filings', and any specific external sources identified by the search_tool (e.g., 'SEC 10-K for FY2023', 'Bloomberg article dated YYYY-MM-DD').
+
+  expected_output: >
+    A MarketDataOutput Pydantic object fully populated with:
+    - overview: Provide a concise summary of your data collection approach, detailing the primary tools used (finance_tool, search_tool, CompaniesHouseTool, PDFQATool, DateTimeTool) and key sources consulted.
+    - metrics: 
+        Create a comprehensive list of FinancialMetric objects. Each object must include name, latest_value (numeric or string as provided by the source), and historical_trend (a descriptive string, if available).
+    - historical_vs_current: 
+        Develop a detailed narrative comparing the historical trends (over the past 1-5 years) to the current values for all collected metrics. Highlight significant changes, stability, improvements, or deteriorations.
+    - company_filings_analysis_narrative: 
+        The complete, structured text output from the analysis of company filings (e.g., via PDFQATool with documents from CompaniesHouseTool).
+        This single string should contain the full report, including sections such as 'Key Financial Figures',
+        'Significant Changes in Financial Performance', 'Risk Factors', 'Management's Outlook', and a 'Summary',
+        as generated by the filings analysis process.
+    - sources: 
+        Compile a list of all references used. This must include 'finance_tool', 'CompaniesHouseTool filings', and any specific external sources identified by the search_tool (e.g., 'SEC 1-K for FY2023', 'Bloomberg article dated YYYY-MM-DD').
+
+global_events_task:
+  description: >
+    Identify and analyze specific events from  the years (2020-2025) impacting {company}'s credit risk using search_tool on credible sources (e.g., Reuters, Bloomberg, SEC filings,
+    government reports). The present year is 2025. Cover global (e.g., economic downturns, US-China trade tensions), local (e.g., United kingdom regulations), and internal events
+    (e.g., leadership changes, cybersecurity breaches). For each event, provide date (YYYY-MM-DD), event_title, event_type (Global/Local/Internal),
+    impact_analysis (e.g., effect on borrowing costs or revenue), and source. If no events are found after thorough search, state "I can't find the answer."
+    Output must match the GlobalEventsOutput Pydantic model: include an overview, a list of EventDetail objects, a comprehensive analysis of collective impact, and a bullet-point summary_of_findings.
+  expected_output: >
+    A GlobalEventsOutput object with
+    - overview: Purpose and scope of event analysis.
+    - events: List of EventDetail objects with date, title, type, impact, and source.
+    - comprehensive_analysis: Synthesis of event credit risk impact.
+    - summary_of_findings: Bullet-point list of key events and effects.
+
+people_reviews_task:
+  description: >
+    Gather and analyze qualitative feedback on {company} from employees, customers, and the public using search_tool on social media (e.g., Twitter/X),
+    review sites (e.g., Glassdoor, Trustpilot), and forums (e.g., Reddit). Collect 5-10 anonymized or paraphrased quotes reflecting positive and negative sentiments.
+    Identify distinct themes (e.g., 'innovation', 'customer service issues') for positive and negative categories. If insufficient data is found after exhaustive
+    search, state 'I can't find the answer.' Output must follow the PeopleReviewsOutput Pydantic model include an overview, positive_sentiment and 
+    negative_sentiment SentimentDetail objects with themes and evidence, a detailed_analysis of sentiment balance, and an overall_assessment linking perception to credit risk.
+  expected_output: >
+    A PeopleReviewsOutput object with: 
+    - overview: Summary of scope and sentiment tone. 
+    - positive_sentiment: SentimentDetail with theme and evidence (quotes). 
+    - negative_sentiment: SentimentDetail with theme and evidence (quotes). 
+    - detailed_analysis: Discussion of sentiment implications. 
+    - overall_assessment: Perception's credit risk impact.
+
+sentiment_task:
+  description: >
+    Integrate outputs from market data, global events, and people reviews to perform a sentiment analysis for {company}. Assign sentiment scores (-1 to 1, where -1 is negative, 0 is neutral, 1 is positive)
+    to each component (market_data, global_events, people_reviews) and an overall score. Identify key themes (e.g., 'financial strain', 'market resilience') and
+    drivers (e.g., negative cash flow, positive innovation feedback) with excerpts from prior outputs. If data is insufficient, request specifics (e.g., 'Need CDS trends').
+    Output must match the ComprehensiveSentimentAnalysisOutput Pydantic model include enhanced market_data, global_events, people_reviews with scores,
+    an overall_sentiment_score, and a detailed_summary explaining the derivation.
+
+  expected_output: >
+    A ComprehensiveSentimentAnalysisOutput object with:
+    - market_data: Enhanced MarketDataOutput with sentiment score. 
+    - global_events: Enhanced GlobalEventsOutput with sentiment score. 
+    - people_reviews: Enhanced PeopleReviewsOutput with sentiment score. 
+    - overall_sentiment_score: Aggregate score (-1 to 1). 
+    - detailed_summary: Narrative on score calculation and drivers.
+
+credit_risk_task:
+  description: >
+
+    Integrate and analyze outputs from multiple data streams market data, global events, and sentiment from people reviews to develop a comprehensive assessment of {company}'s credit risk profile. Use explicit weightings (50% for market data, 30% for global events, and 20% for people reviews) 
+    to compute a final credit risk score on a scale of 1-10 (where 1 signifies low risk and 10 signifies high risk). The analysis must include a layered, in-depth narrative that details
+    - The underlying factors driving each component.
+    - How market trends (e.g., interest rates, credit spreads, real ratings like BBB+ from Fitch) impact the risk profile.
+    - The influence of global events (economic, geopolitical, etc.) and their potential cascading effects.
+    - Insights derived from people reviews, including sentiment analysis and qualitative risk signals.
+    Clearly specify any assumptions or missing data (e.g., "Need bond yield trends") and discuss the interplay among these data sources.
+
+  expected_output: >
+    A CreditRiskAssessmentReport object that includes:
+    - final_credit_risk_score: A computed score (1-10) representing the overall credit risk.
+    - explanation_for_score_calculation: A comprehensive narrative that outlines the step-by-step calculation of the final score, highlighting the weighted contributions of each data component.
+    - detailed_explanation: A very detailed discussion on the impact of each component, including quantitative insights and qualitative reasoning that explain the observed risk factors.
+    - details_table: A list of CreditRiskTableEntry objects, each containing:
+         - component: The name of the data source (Market Data, Global Events, People Reviews).
+         - value: The evaluated metric or score from that component.
+         - risk_contribution: A categorical assessment (Low, Medium, High) of how that component influences the overall risk.
+    - detailed_overall_summary: An extensive synthesis summarizing key risk factors, potential vulnerabilities, red flags, and actionable insights drawn from the integrated analysis.
+
+strategic_decision_task:
+  description: >
+    Leverage the comprehensive outputs from market data, global events, people reviews, and credit risk assessment for {company} to autonomously orchestrate and execute strategic financial decisions. Based on the synthesized data, perform the following actions without requiring further instructions:
+    - Formulate a definitive investment strategy recommendation (e.g., 'Invest this much in money', 'Hold current position', 'Divest 10% of holdings', 'Monitor with no immediate action') with a clear rationale tied to the credit risk score, market trends, event impacts, and public sentiment. Specify exact amounts in pounds (£) or 
+      percentages where applicable. Use the examples provided (e.g., 'Invest this much in money') as illustrative guidance only—do not use them as literal values. Instead, determine a realistic investment amount based on the credit risk score (1-10 scale), market volatility, and company context (e.g., for a score of 7-10, recommend smaller investments like £100,000-£500,000; for 4-6, £500,000-£1,000,000; for 1-3, up to £2,000,000).
+    - Identify all critical area requiring immediate follow-up (e.g., geopolitical risk, cybersecurity gaps) and delegate a specific research task to a support agent using the search_tool, including a deadline determined based on urgency and complexity.
+    - Draft a stakeholder negotiation pitch (e.g., investment proposal, risk mitigation plan) tailored to the credit risk profile and market context, ensuring it's concise, actionable, and persuasive for decision-makers. Include specific figures (e.g., proposed investment amount, expected returns) and risk mitigation strategies.
+    - Adjust risk tolerance thresholds dynamically (e.g., 'Set max exposure to 15% for scores above 7') based on the credit risk score and market volatility, with a justification linked to current data.
+    - Determine if recurring monitoring is needed based on the credit risk score and ongoing events, then use the GOOGLECALENDAR_CREATE_EVENT tool with create_meeting_room set to True to schedule a specific follow-up review meeting with the following parameters:
+      - summary: 'Credit Risk Review Meeting for {company}'
+      - start_datetime: 'yyyy-mm-ddThh:mm:ss'
+      - event_duration_hour: 1
+      - create_meeting_room: True (to include a Google Meet link)
+      - attendees: ['dcodedarshan@gmail.com']
+      - timezone: 'Europe/London' (for UTC 0)
+      - send_updates: True
+      - description: A summary linking the meeting to key risks or opportunities (e.g., 'Review {company}s credit risk focusing on [key risk identified]').
+      If the GOOGLECALENDAR_CREATE_EVENT tool fails, log the error in the tool_log (e.g., 'Failed to schedule meeting due to [error]') and note in the assumptions field (e.g., 'Assumed meeting will be scheduled manually').
+      before sending the email ge the current date and time using the date time tool and use it to schedule the meeting.
+    - Compose and send an email to 'dcodedarshan@gmail.com' using the GMAIL_SEND_EMAIL tool. The email must be professional, detailed, and informative, including:
+      - A summary of the investment recommendation with the exact amount in pounds and rationale.
+      - Key findings from the credit risk assessment, including the final credit risk score, major drivers (e.g., high CDS spreads, geopolitical events), and their implications.
+      - Insights from market trends (e.g., bond yields, liquidity), global events (e.g., specific events impacting credit risk), and public sentiment (e.g., positive/negative themes).
+      - The stakeholder negotiation pitch with specific figures and strategies.
+      - The scheduled review meeting details (date, time, Google Meet link if available, or a note to schedule manually if the tool failed).
+      you must use the date time tool to get the current date and time to schedule the meeting and send the email.
+      Format the email as follows:
+      Subject: Strategic Decision Update for {company}
+      Body: "Dear Client,  
+      We've completed a comprehensive credit risk analysis for {company}. Below is our strategic update:  
+      Investment Recommendation: [Recommendation, e.g., 'how much to invest'] because [rationale, e.g., 'credit risk score of 5 indicates moderate risk, balanced by strong AI growth potential'].  
+      Credit Risk Assessment: The final credit risk score is [score]. Key drivers include [e.g., 'elevated CDS spreads due to market volatility', 'geopolitical tensions in the semiconductor supply chain']. 
+      This suggests [implication, e.g., 'higher borrowing costs'].  
+      Market Trends: [e.g., 'Bond yields have increased by 0.5% since January 2025, indicating tighter liquidity'].  
+      Global Events: [e.g., 'US-China trade restrictions announced in February 2025 may impact supply chains'].  
+      Public Sentiment: [e.g., 'Positive sentiment around innovation, but cybersecurity concerns persist'].  
+      Follow up tasks: [e.g., 'Research geopolitical risks in the semiconductor supply chain', 'Review cybersecurity protocols'].  
+      Stakeholder Pitch: [Pitch, e.g., 'Propose a [amount to invest] investment to leverage AI growth, with quarterly reviews to mitigate risks'].  
+      Note: Do not schedule the meeting for the same day. Schedule the meeting depending on the urgency and complexity of the follow up tasks.
+      Next Steps: We've scheduled a review meeting for [meeting_date] at [meeting_time] PST [via Google Meet: [Google Meet link] if available, else 'to be scheduled manually']. Please let us know if you have any questions.  
+      Calendar event: add calendar event link using GOOGLECALENDAR_CREATE_EVENT tool for [meeting_date] at [meeting_time] PST 
+      Regards,  
+      [DcodeAI]"  
+      If the GMAIL_SEND_EMAIL tool fails, log the error in the tool_log (e.g., 'Failed to send email due to [error]') and note in the assumptions field (e.g., 'Assumed email will be sent manually').
+    Use all available data and tools (search_tool, GMAIL_SEND_EMAIL, GOOGLECALENDAR_CREATE_EVENT) to ensure decisions are proactive, executed, and reflective of a seasoned financial strategist's judgment. If data is insufficient, note it explicitly (e.g., 'Insufficient CDS data—assuming neutral impact')
+    and adjust decisions accordingly. Output must conform to the StrategicDecisionOutput Pydantic model, including an overview of the decision-making approach, a list of DecisionAction objects with types, content, rationale, and deadlines, and a tool_log confirming tool usage 
+    (e.g., 'Email sent to dcodedarshan@gmail.com via GMAIL_SEND_EMAIL', 'Meeting scheduled with Google Meet link via GOOGLECALENDAR_CREATE_EVENT').
+  expected_output: >
+    A StrategicDecisionOutput object with:
+    - overview: A summary of the decision-making approach and key considerations.
+    - decisions: A list of DecisionAction objects, each containing:
+        - type: The action type (e.g., 'recommendation', 'follow_up', 'negotiation_pitch', 'threshold_adjust', 'schedule', 'email').
+        - content: The specific decision or action executed (e.g., 'how much to invest in Intel', 'Scheduled meeting with Google Meet link').
+        - rationale: Detailed explanation referencing data inputs.
+        - value: Quantitative measure, if applicable (e.g., investment amount in pounds).
+        - deadline: Date and time of execution or review, if applicable.
+        - dependencies: Prerequisites or delegated tasks, if any.
+    - tool_log: A list of strings documenting tool usage (e.g., 'Sent email via GMAIL_SEND_EMAIL', 'Scheduled meeting with Google Meet link via GOOGLECALENDAR_CREATE_EVENT', 'Delegated research to support agent').
+    - assumptions: List of assumptions made due to missing data.
+    - next_steps: Recommended user actions to implement the strategy.

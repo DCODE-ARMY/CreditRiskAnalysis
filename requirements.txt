@@ -1,0 +1,16 @@
+agentops
+crewai[tools]
+crewai[agentops]
+composio_crewai
+databricks-sdk
+streamlit
+pandas
+plotly
+reportlab
+pyyaml
+langchain-community 
+mistralai
+mlflow
+requests
+pydantic
+certifi
